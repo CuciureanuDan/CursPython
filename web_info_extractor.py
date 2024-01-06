@@ -46,23 +46,22 @@ def get_meta_description(soup):
         str: Continutul descrierii sau un mesaj de eroare daca tag-ul nu este gasit.
     """
     meta_description = soup.find('meta', attrs={'name': 'description'})
-    # Verifica dacă exista meta description
+    
     if meta_description:
-        # Extrage continutul tag-ului meta
         return meta_description.get('content')
     else:
         return "Nu a fost gasit tag-ul meta description."
 
 # e recomandat de folosit, ruleaza doar daca codul este rulat independent, nu ca modul al altui script
-#if __name__ == "__main__":
+if __name__ == "__main__":
    
-# introducem url-ul de la tastatura
-url = input("Introdu URL-ul: ")
+    # introducem url-ul de la tastatura
+    url = input("Introdu URL-ul: ")
 
-# obtine titlul si description meta al paginii web
-page_info = get_page_info(url)
+    # obtine titlul si description meta al paginii web
+    page_info = get_page_info(url)
 
-# afiseaza informatiile despre pagina web
-if page_info:
-    print("Titlul paginii:", page_info['title'])
-    print("Descrierea paginii:", page_info['description'])
+    # afiseaza informatiile despre pagina web
+    if page_info:
+        print("Titlul paginii:", page_info['title'])
+        print("Descrierea paginii:", page_info['description'])
