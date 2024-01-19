@@ -1,9 +1,12 @@
 """
   Extragem din fisierul cu extensia .ini link-ul site-ului olx , numele produsului cautat 
+
+  Am adaugat posibilitatea folosirii parametrului -log pentru afisarea timpului necesar fiecarui request
 """
 
 from configparser import ConfigParser
 import requests
+import argparse
 from bs4 import BeautifulSoup
 
 
@@ -23,23 +26,41 @@ def extragereNr(x):
     return int(sir) if sir else -1
 
 
+def time_decorator(func):
+    def modificare(*pargs, **kargs):
+        result = func(*pargs, **kargs)
+        if args.log:
+            print(f"Timpul necesar pentru request: {result.elapsed.total_seconds()} secunde\n\n")
+        return result
+    return modificare
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-log", help="Introduce timpul necesar fiecarui request",action="store_true")
+args = parser.parse_args()
+
+
+
 config = ConfigParser()
 
 config.read('site_urls.ini')
 
 link = config['olx']['url']
 produs = config['olx']['produs']
-
 url = link + produs
 
-response = requests.get(url)
+
+@time_decorator
+def cerere(url):
+    return requests.get(url , timeout=2)
+
+response = cerere(url)
 
   # divurile ce contin titlul si pretul sunt de forma urmatoare 
 #<div class="css-u2ayx9">
 #<h6 class="css-16v5mdi er34gjf0">iPhone 15 ProMax, 512 gb, blue, sigilat</h6>
 #<p data-testid="ad-price" class="css-10b0gli er34gjf0">7 300 lei</p>  # pe langa lei poate sa contina si alte caractere
 #</div>
-
 
 produse=[]
 
