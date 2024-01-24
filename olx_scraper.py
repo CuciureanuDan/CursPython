@@ -2,12 +2,15 @@
   Extragem din fisierul cu extensia .ini link-ul site-ului olx , numele produsului cautat 
 
   Am adaugat posibilitatea folosirii parametrului -log pentru afisarea timpului necesar fiecarui request
+
+  Am adaugat posibilitatea trimiterii unui email daca in 'site_urls.ini' exista un pret si un email al destinatarului si daca exista vreun produs sub acel pret 
 """
 
 from configparser import ConfigParser
 import requests
 import argparse
 from bs4 import BeautifulSoup
+from mailer import send_email
 
 
 def extragereNr(x):
@@ -50,6 +53,17 @@ produs = config['olx']['produs']
 url = link + produs
 
 
+check_send_email = False
+
+#verificam daca exista date posibile pentru trimiterea email-ului
+
+if 'email' in config and 'dest' in config['email'] and config['email']['dest']:
+        if 'limite de pret' in config and 'pret' in config['limite de pret'] and config['limite de pret']['pret']:
+            check_send_email = True
+            dest = config['email']['dest']
+            lim = extragereNr( config['limite de pret']['pret'] )
+
+
 @time_decorator
 def cerere(url):
     return requests.get(url , timeout=2)
@@ -90,5 +104,17 @@ if produse:
         print(f"Titlu:  {aux['titlu']} \n Pret: {aux['pret']} lei \n")
 
 
+if check_send_email:
 
+    #verifica daca exista vreun produs e sub limita ceruta de pret
+    #Daca produsul nu are pret afisat, el va primi valoarea '-1' , am facut si o verificare pentru asta
+    #As putea elimina si problema in care daca sunt accesorii de vanzare facand any() asa: any(produs['pret'] <= lim and produs['pret'] > 1000 for produs in produse)
+    #Dar daca modific asa as strica verificarea pentru alte produse 
 
+    if any(produs['pret'] <= lim and produs['pret'] > 1000 for produs in produse):
+        send_email(dest,produs,lim)
+    else:
+        print(f"\n Nu exista produse cu pretul sub {lim} lei.")
+    
+    
+    #produsele_cautate = [produs for produs in produse if produs['pret'] < lim] #pentru viitoare implementari, sa si afisam numele si pretul. Poate si un link?

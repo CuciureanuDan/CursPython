@@ -1,3 +1,12 @@
+"""
+Modul pentru trimiterea de email-uri de notificare privind scaderea pretului unui produs.
+
+Acest modul utilizeaza un fisier de configurare 'EmailData.ini' pentru a obtine informatiile necesare pentru trimiterea email-urilor.
+
+Nota:
+    - Fisierul 'EmailData.ini' trebuie creat de catre utilizator si trebuie sa contina sectiunea [credentials] cu cheile 'email' și 'password'.
+    - Exista posibilitatea ca e-mailurile sa intre in spam
+"""
 
 import smtplib 
 from smtplib import SMTPAuthenticationError, SMTPException
@@ -7,8 +16,31 @@ from configparser import ConfigParser
 
 # Fisierul 'EmailData.ini' contine informatii referitoare la adresa de email utilizata pentru trimiterea mesajelor
 # Contine sectiunea credentials cu cheile email si password
+# Acesta trebuie creat de catre utilizatorul codului
 
 def send_email(email_receiver, product, price):
+
+    """
+    Trimite un email de notificare catre un destinatar specificat atunci cand pretul unui produs scade sub o anumita limita.
+
+    Exemplu de utilizare:
+        send_email('destinatar@example.com', 'Telefon Smart', 1500.0)
+
+    Args:
+        email_receiver (str): Adresa de email a destinatarului.
+        product (str): Numele produsului pentru care se trimite notificarea.
+        price (int/float): Limita de pret sub care notificarea este trimisa.
+
+    Raises:
+        ValueError: Daca nu se pot citi informatiile din fisierul 'EmailData.ini' sau daca nu sunt furnizate adresa de email sau parola.
+        SMTPAuthenticationError: Daca apare o eroare la autentificarea SMTP, indicand ca adresa de email sau parola sunt gresite.
+        SMTPException: Alte erori SMTP neasteptate.
+        Exception: Alte erori neasteptate.
+
+    Returns:
+        None: In caz de succes, afiseaza un mesaj de confirmare. In caz contrar, afiseaza mesaje de eroare si opreste executia.
+
+    """
 
     config = ConfigParser()
 
@@ -56,12 +88,12 @@ def send_email(email_receiver, product, price):
         
             smtp.sendmail(email_sender,email_receiver,em.as_string())
 
+            print("\n\n Emailul a fost trimis cu succes! \n\n")
+
     except SMTPAuthenticationError:
         print("Eroare de autentificare SMTP. Email-ul sau parola sunt gresite")
     except SMTPException as e:
         print(f"Eroare SMTP: {e}")
     except Exception as e:
         print(f"Alta eroare: {e}")
-
-
-send_email('xdan181@yahoo.com', 'asd ', 'sss ')
+        
