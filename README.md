@@ -1,4 +1,4 @@
-# Proiectul Web Scraper
+# Proiect Web Scraper
 
 Acest proiect contine mai multe scripturi Python pentru extragerea informatiilor de pe internet, configurate si personalizate in functie de diferite scenarii.
 Mai jos sunt detaliile si instructiunile pentru fiecare script.
